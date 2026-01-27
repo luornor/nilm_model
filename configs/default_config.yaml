@@ -16,31 +16,39 @@ data:
 
 # Model configuration
 model:
-  name: "Seq2PointCNN"
+  name: "ImprovedSeq2PointCNN"  # Options: "Seq2PointCNN", "ImprovedSeq2PointCNN", "DeepSeq2PointCNN"
   window_size: 5
   input_channels: 1
-  conv_channels: [16, 32]
+  conv_channels: [32, 64, 128, 64]  # Deeper than original [16, 32]
   conv_kernel_size: 3
   conv_padding: 1
-  hidden_dim: 32
+  hidden_dim: 64  # Larger than original 32
   output_dim: 1
   activation: "relu"
-  dropout: 0.0
+  dropout: 0.3  # Add regularization (was 0.0)
+  use_batch_norm: true  # Enable batch normalization
+  use_residual: false  # For DeepSeq2PointCNN_batch_norm: true
 
 # Training configuration
 training:
   batch_size: 256
   learning_rate: 0.001
-  epochs: 8
+  epochs: 30  # Train longer (was 8)
   seed: 42
   loss_type: "BCEWithLogitsLoss"
   pos_weight_auto: true
   optimizer: "Adam"
   optimizer_kwargs: {}
+  # Learning rate scheduler
+  scheduler: "ReduceLROnPlateau"  # Reduce LR when validation F1 plateaus
+  scheduler_patience: 3
+  scheduler_factor: 0.5
+  scheduler_step_size: 10
+  scheduler_gamma: 0.1
   val_split: 0.2
   stratify: true
   log_interval: 100
-  save_best: false
+  save_best: true  # Save best model based on validation F1
   device: null  # null = auto-detect
 
 # Fine-tuning configuration

@@ -16,7 +16,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from nilm_framework.config import ExperimentConfig, DataConfig, ModelConfig, TrainingConfig
-from nilm_framework.models import Seq2PointCNN
+from nilm_framework.models import Seq2PointCNN, ImprovedSeq2PointCNN, DeepSeq2PointCNN
 from nilm_framework.data import create_dataloaders
 from nilm_framework.training import Trainer
 from nilm_framework.utils import find_appliance_columns, set_seed
@@ -97,18 +97,43 @@ def train_appliance(
         print(f"  Error creating data loaders: {e}")
         return None
     
-    # Create model
-    model = Seq2PointCNN(
-        window_size=config.model.window_size,
-        input_channels=config.model.input_channels,
-        conv_channels=config.model.conv_channels,
-        conv_kernel_size=config.model.conv_kernel_size,
-        conv_padding=config.model.conv_padding,
-        hidden_dim=config.model.hidden_dim,
-        output_dim=config.model.output_dim,
-        activation=config.model.activation,
-        dropout=config.model.dropout,
-    )
+    # Create model based on config
+    model_name = config.model.name.lower()
+    
+    if model_name == "improvedseq2pointcnn":
+        model = ImprovedSeq2PointCNN(
+            window_size=config.model.window_size,
+            input_channels=config.model.input_channels,
+            conv_channels=config.model.conv_channels,
+            conv_kernel_size=config.model.conv_kernel_size,
+            use_batch_norm=config.model.use_batch_norm,
+            dropout=config.model.dropout,
+            hidden_dim=config.model.hidden_dim,
+            output_dim=config.model.output_dim,
+            activation=config.model.activation,
+            use_residual=config.model.use_residual,
+        )
+    elif model_name == "deepseq2pointcnn":
+        model = DeepSeq2PointCNN(
+            window_size=config.model.window_size,
+            input_channels=config.model.input_channels,
+            base_channels=config.model.base_channels,
+            num_blocks=config.model.num_blocks,
+            dropout=config.model.dropout,
+            output_dim=config.model.output_dim,
+        )
+    else:  # Default to Seq2PointCNN
+        model = Seq2PointCNN(
+            window_size=config.model.window_size,
+            input_channels=config.model.input_channels,
+            conv_channels=config.model.conv_channels,
+            conv_kernel_size=config.model.conv_kernel_size,
+            conv_padding=config.model.conv_padding,
+            hidden_dim=config.model.hidden_dim,
+            output_dim=config.model.output_dim,
+            activation=config.model.activation,
+            dropout=config.model.dropout,
+        )
     
     # Create trainer
     trainer = Trainer(model, config.training)

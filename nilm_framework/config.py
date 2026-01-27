@@ -39,22 +39,28 @@ class DataConfig:
 @dataclass
 class ModelConfig:
     """Configuration for model architecture."""
-    name: str = "Seq2PointCNN"
+    name: str = "ImprovedSeq2PointCNN"  # "Seq2PointCNN", "ImprovedSeq2PointCNN", "DeepSeq2PointCNN"
     window_size: int = 5  # Should match DataConfig.window_size
     
     # CNN architecture
     input_channels: int = 1
-    conv_channels: List[int] = field(default_factory=lambda: [16, 32])
+    conv_channels: List[int] = field(default_factory=lambda: [32, 64, 128, 64])
     conv_kernel_size: int = 3
     conv_padding: int = 1
-    hidden_dim: int = 32
+    hidden_dim: int = 64
     output_dim: int = 1  # Binary classification
     
     # Activation
     activation: str = "relu"
     
-    # Dropout (for future use)
-    dropout: float = 0.0
+    # Regularization
+    dropout: float = 0.3
+    use_batch_norm: bool = True
+    
+    # Advanced options
+    use_residual: bool = False  # For DeepSeq2PointCNN
+    base_channels: int = 32  # For DeepSeq2PointCNN
+    num_blocks: int = 4  # For DeepSeq2PointCNN
 
 
 @dataclass

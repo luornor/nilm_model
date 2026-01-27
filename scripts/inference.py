@@ -14,7 +14,7 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from nilm_framework.config import ExperimentConfig
-from nilm_framework.models import Seq2PointCNN
+from nilm_framework.models import Seq2PointCNN, ImprovedSeq2PointCNN, DeepSeq2PointCNN
 from nilm_framework.inference import Predictor
 from nilm_framework.evaluation import (
     plot_confidence_histogram,
@@ -124,16 +124,43 @@ def main():
             print(f"  Warning: Model not found for {appliance}")
             continue
         
-        # Create model
-        model = Seq2PointCNN(
-            window_size=args.window_size,
-            input_channels=config.model.input_channels,
-            conv_channels=config.model.conv_channels,
-            conv_kernel_size=config.model.conv_kernel_size,
-            conv_padding=config.model.conv_padding,
-            hidden_dim=config.model.hidden_dim,
-            output_dim=config.model.output_dim,
-        )
+        # Create model (architecture must match saved model)
+        # Try to infer model type from config, default to ImprovedSeq2PointCNN
+        model_name = config.model.name.lower() if hasattr(config.model, 'name') else "improvedseq2pointcnn"
+        
+        if model_name == "improvedseq2pointcnn":
+            model = ImprovedSeq2PointCNN(
+                window_size=args.window_size,
+                input_channels=config.model.input_channels,
+                conv_channels=config.model.conv_channels,
+                conv_kernel_size=config.model.conv_kernel_size,
+                use_batch_norm=getattr(config.model, 'use_batch_norm', True),
+                dropout=getattr(config.model, 'dropout', 0.3),
+                hidden_dim=config.model.hidden_dim,
+                output_dim=config.model.output_dim,
+                activation=config.model.activation,
+            )
+        elif model_name == "deepseq2pointcnn":
+            model = DeepSeq2PointCNN(
+                window_size=args.window_size,
+                input_channels=config.model.input_channels,
+                base_channels=getattr(config.model, 'base_channels', 32),
+                num_blocks=getattr(config.model, 'num_blocks', 4),
+                dropout=getattr(config.model, 'dropout', 0.3),
+                output_dim=config.model.output_dim,
+            )
+        else:  # Default to Seq2PointCNN for backward compatibility
+            model = Seq2PointCNN(
+                window_size=args.window_size,
+                input_channels=config.model.input_channels,
+                conv_channels=config.model.conv_channels,
+                conv_kernel_size=config.model.conv_kernel_size,
+                conv_padding=config.model.conv_padding,
+                hidden_dim=config.model.hidden_dim,
+                output_dim=config.model.output_dim,
+                activation=config.model.activation,
+                dropout=getattr(config.model, 'dropout', 0.0),
+            )
         
         # Load weights
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
