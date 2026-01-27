@@ -1,0 +1,33 @@
+# Ignore MATLAB data folder
+Matlab_Data/
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+*.swo
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Build / distribution
+build/
+dist/
+*.egg-info/
