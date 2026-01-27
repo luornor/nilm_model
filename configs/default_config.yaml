@@ -1,0 +1,74 @@
+# Default configuration for NILM framework
+
+experiment_name: "nilm_experiment"
+output_dir: "outputs"
+
+# Data configuration
+data:
+  dataset_root: "Dataset"
+  matlab_data_dir: "Matlab_Data"
+  exports_dir: "Exports"
+  bin_size_seconds: 5.0
+  window_size: 5
+  normalize_per_window: true
+  min_samples_per_appliance: 200
+  min_positives_per_appliance: 20
+
+# Model configuration
+model:
+  name: "Seq2PointCNN"
+  window_size: 5
+  input_channels: 1
+  conv_channels: [16, 32]
+  conv_kernel_size: 3
+  conv_padding: 1
+  hidden_dim: 32
+  output_dim: 1
+  activation: "relu"
+  dropout: 0.0
+
+# Training configuration
+training:
+  batch_size: 256
+  learning_rate: 0.001
+  epochs: 8
+  seed: 42
+  loss_type: "BCEWithLogitsLoss"
+  pos_weight_auto: true
+  optimizer: "Adam"
+  optimizer_kwargs: {}
+  val_split: 0.2
+  stratify: true
+  log_interval: 100
+  save_best: false
+  device: null  # null = auto-detect
+
+# Fine-tuning configuration
+fine_tuning:
+  predictions_csv: ""
+  pos_threshold: 0.90
+  neg_threshold: 0.10
+  max_pos_samples: 6000
+  max_neg_samples: 6000
+  min_confident_samples: 200
+  epochs: 5
+  learning_rate: 0.0002
+  batch_size: 256
+  use_fallback_selection: true
+
+# Inference configuration
+inference:
+  natural_data_csv: ""
+  model_dir: ""
+  output_csv: ""
+  target_appliances: []  # Empty = all available
+  smoothing_window: 5
+  on_threshold: 0.55
+  off_threshold: 0.45
+  plot_histograms: true
+  plot_onoff_states: true
+  plot_overlay: true
+  plot_output_dir: ""
+
+# Target appliances (None = auto-discover from data)
+target_appliances: null

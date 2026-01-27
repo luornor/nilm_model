@@ -1,5 +1,5 @@
-# Ignore MATLAB data folder
-Matlab_Data/
+# Ignore MATLAB data folder inside Dataset
+/Dataset/Matlab_Data/
 
 # Python artifacts
 __pycache__/
@@ -31,3 +31,19 @@ Thumbs.db
 build/
 dist/
 *.egg-info/
+
+# ML experiment / logging artifacts
+runs/
+wandb/
+lightning_logs/
+checkpoints/
+*.ckpt
+
+# Python tooling caches
+.mypy_cache/
+.pytest_cache/
+.cache/
+
+# MATLAB autosave / backup files
+*.asv
+*~
