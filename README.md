@@ -68,6 +68,11 @@ pip install torch numpy pandas scikit-learn matplotlib pyyaml
 conda install pytorch numpy pandas scikit-learn matplotlib pyyaml -c pytorch
 ```
 
+## Additional Documentation
+
+- Design and architecture: see `design.md` for a consolidated view of the pipeline, framework structure, model architecture, refactoring summary, and improved model integration.
+- Next steps and roadmap: see `NEXT_STEPS.md` for concrete improvement plans and recommended next experiments.
+
 ## Quick Start
 
 ### 1. Prepare Data
