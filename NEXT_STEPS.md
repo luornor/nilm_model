@@ -40,12 +40,12 @@
 
 | Item | Status |
 |------|--------|
-| **Trained models** (improved) | ✅ `outputs/models/` – 23 appliances |
+| **Trained models** (improved) | ✅ `outputs/training/models/` – 23 appliances |
 | **Natural aggregate data** | ✅ `Exports/dataset_undersampled_5s/lit_natural_5s.csv` (file, t_sec, P) |
-| **Predictions on natural** from **new** models | ❌ Not done yet |
-| **Fine-tuning** of new models | ❌ Not done (and requires natural predictions first) |
+| **Predictions on natural** from **new** models | ✅ `outputs/inference/natural_predictions.csv` + plots in `outputs/inference/plots/` |
+| **Fine-tuning** of new models | ❌ Not done yet (requires natural predictions; ready now) |
 
-Existing `Exports/.../natural_predictions.csv` and fine-tuned models under `Exports/` come from the **old** pipeline (older models). For the **new** improved models, we have not yet run inference on natural data.
+Existing files under `Exports/` (older `natural_predictions.csv` and fine-tuned models) belong to the **old** pipeline and should be treated as legacy.
 
 ---
 
@@ -77,49 +77,126 @@ Fine-tuning uses **predictions on natural data** as pseudo-labels. So we **must*
 
 ---
 
-## 4. Concrete Next Steps
+## 4. Concrete Next Steps (Updated)
 
-### Step 1: Run inference on natural data (do this first)
+### Step 1: Inference on natural data (DONE, command for re-runs)
+
+Natural predictions for the improved models have already been generated to `outputs/inference/natural_predictions.csv` with plots in `outputs/inference/plots/` using:
 
 ```bash
-python scripts/inference.py \
+py -3.11 scripts/inference.py \
   --data Exports/dataset_undersampled_5s/lit_natural_5s.csv \
-  --model-dir outputs/models \
-  --output outputs/natural_predictions.csv \
-  --plot-dir outputs/plots \
-  --config configs/default_config.yaml
+  --model-dir outputs/training/models \
+  --output outputs/inference/natural_predictions.csv \
+  --plot-dir outputs/inference/plots \
+  --config configs/default_config.yaml \
+  --window-size 5
 ```
 
-- Use `--data` and `--model-dir` paths that match your project root (e.g. run from `Dataset` or project root, depending on where `Exports/` lives).
-- This will:
-  - Run all 23 improved models on natural aggregate power.
-  - Save per-appliance probabilities in `outputs/natural_predictions.csv`.
-  - Save histograms and overlay plots in `outputs/plots/` if `--plot-dir` is set.
+Re-use this command whenever you retrain models or after fine-tuning.
 
-### Step 2: Inspect outputs
+### Step 2: Appliance grouping based on natural probability distributions
 
-- Open `outputs/natural_predictions.csv` and check that:
-  - Probabilities are not all 0 or all 1.
-  - Different appliances show different distributions.
-- Look at `outputs/plots/` (e.g. histograms, overlay plots) to see if ON/OFF structure looks plausible.
+Using `outputs/inference/natural_predictions.csv`, each appliance probability column was analyzed (mean, quantiles, and mass below 0.2 / above 0.8). Appliances are grouped as:
 
-### Step 3: Fine-tune selected appliances (optional, after Step 1)
+- **Almost always off** (very low mean, >97% of mass ≤ 0.2):
+  - y_LED_Lamp_B0
+  - y_Hair_Dryer_1900W_U0
+  - y_Resistor_200ohm_L0
+  - y_Microwave_Standby_A0
+  - y_Fan_Heater_T0
+  - y_Hair_Dryer_2100W_Z0
 
-For appliances you care about (e.g. top 5–10 by F1, or those you need for demos):
+- **Mostly low** (dominant mass near 0, occasional spikes):
+  - y_Hair_Dryer_2100W_Y0
+  - y_Oil_Heater_R0
+  - y_Fan_3Speed_K0
+  - y_Hair_Dryer_1900W_V0
+  - y_Hair_Dryer_2000W_X0
+  - y_Hair_Dryer_2000W_W0
+  - y_AC_Adapter_Sony_M0
+  - y_Impact_Drill_P0
+
+- **Ambiguous / broad** (substantial mass in mid-range 0.2–0.8):
+  - y_Phone_Charger_Asus_G0
+  - y_Microwave_On_S0
+  - y_Oil_Heater_Q0
+  - y_Phone_Charger_Motorola_I0
+
+- **Bimodal (good separation)** (clear mass near both 0 and 1, limited mid-range):
+  - y_Incandescent_Lamp_N0
+  - y_Soldering_Station_H0
+  - y_LED_Panel_D0
+
+- **Mostly high** (often ON, strong peak near 1):
+  - y_Smoke_Extractor_E0
+
+The raw numbers and derived categories are codified in `configs/per_appliance_thresholds.yaml`.
+
+### Step 3: Per-appliance ON/OFF threshold tuning
+
+From the grouping above, per-appliance hysteresis thresholds (ON/OFF) have been chosen and stored in `configs/per_appliance_thresholds.yaml`:
+
+- **Bimodal / mostly_high appliances** (confident ON/OFF separation):
+  - y_Incandescent_Lamp_N0, y_Soldering_Station_H0, y_LED_Panel_D0, y_Smoke_Extractor_E0
+  - Thresholds: `on = 0.8`, `off = 0.2` (conservative ON, aggressive OFF to reduce false positives).
+
+- **Ambiguous appliances** (broad distributions):
+  - y_Phone_Charger_Asus_G0, y_Microwave_On_S0, y_Oil_Heater_Q0, y_Phone_Charger_Motorola_I0
+  - Thresholds: `on = 0.6`, `off = 0.4` (moderate hysteresis, close to 0.5 but stabilised).
+
+- **Almost_always_off / mostly_low appliances**:
+  - Remaining appliances listed above (LED_Lamp_B0, fans, hair dryers, resistor, AC_Adapter_Sony, Impact_Drill, Microwave_Standby, Fan_Heater_T0, etc.)
+  - Thresholds: `on = 0.6`, `off = 0.4` (keeps rare, confident spikes while avoiding noise).
+
+These thresholds currently affect analysis/interpretation (plots and any downstream ON/OFF conversion). The global defaults in `configs/default_config.yaml` can be left as-is; per-appliance overrides live in `configs/per_appliance_thresholds.yaml` for future integration into plotting or evaluation.
+
+### Step 4: Fine-tune selected appliances (commands to run)
+
+Use the improved models from `outputs/training/models` and the new natural predictions at `outputs/inference/natural_predictions.csv`. For each appliance, run:
+
+- Incandescent Lamp:
+  - `py -3.11 scripts/finetune.py --config configs/default_config.yaml --predictions outputs/inference/natural_predictions.csv --model outputs/training/models/cnn_seq2point_y_Incandescent_Lamp_N0.pt --output outputs/training/models/finetuned/cnn_seq2point_y_Incandescent_Lamp_N0_finetuned_natural.pt --window-size 5`
+
+- AC Adapter (Sony):
+  - `py -3.11 scripts/finetune.py --config configs/default_config.yaml --predictions outputs/inference/natural_predictions.csv --model outputs/training/models/cnn_seq2point_y_AC_Adapter_Sony_M0.pt --output outputs/training/models/finetuned/cnn_seq2point_y_AC_Adapter_Sony_M0_finetuned_natural.pt --window-size 5`
+
+- Soldering Station:
+  - `py -3.11 scripts/finetune.py --config configs/default_config.yaml --predictions outputs/inference/natural_predictions.csv --model outputs/training/models/cnn_seq2point_y_Soldering_Station_H0.pt --output outputs/training/models/finetuned/cnn_seq2point_y_Soldering_Station_H0_finetuned_natural.pt --window-size 5`
+
+- Oil Heaters (Q and R):
+  - `py -3.11 scripts/finetune.py --config configs/default_config.yaml --predictions outputs/inference/natural_predictions.csv --model outputs/training/models/cnn_seq2point_y_Oil_Heater_Q0.pt --output outputs/training/models/finetuned/cnn_seq2point_y_Oil_Heater_Q0_finetuned_natural.pt --window-size 5`
+  - `py -3.11 scripts/finetune.py --config configs/default_config.yaml --predictions outputs/inference/natural_predictions.csv --model outputs/training/models/cnn_seq2point_y_Oil_Heater_R0.pt --output outputs/training/models/finetuned/cnn_seq2point_y_Oil_Heater_R0_finetuned_natural.pt --window-size 5`
+
+- Phone Chargers:
+  - Asus: `py -3.11 scripts/finetune.py --config configs/default_config.yaml --predictions outputs/inference/natural_predictions.csv --model outputs/training/models/cnn_seq2point_y_Phone_Charger_Asus_G0.pt --output outputs/training/models/finetuned/cnn_seq2point_y_Phone_Charger_Asus_G0_finetuned_natural.pt --window-size 5`
+  - Motorola: `py -3.11 scripts/finetune.py --config configs/default_config.yaml --predictions outputs/inference/natural_predictions.csv --model outputs/training/models/cnn_seq2point_y_Phone_Charger_Motorola_I0.pt --output outputs/training/models/finetuned/cnn_seq2point_y_Phone_Charger_Motorola_I0_finetuned_natural.pt --window-size 5`
+
+- Smoke Extractor and LED Panel:
+  - Smoke_Extractor_E0: `py -3.11 scripts/finetune.py --config configs/default_config.yaml --predictions outputs/inference/natural_predictions.csv --model outputs/training/models/cnn_seq2point_y_Smoke_Extractor_E0.pt --output outputs/training/models/finetuned/cnn_seq2point_y_Smoke_Extractor_E0_finetuned_natural.pt --window-size 5`
+  - LED_Panel_D0: `py -3.11 scripts/finetune.py --config configs/default_config.yaml --predictions outputs/inference/natural_predictions.csv --model outputs/training/models/cnn_seq2point_y_LED_Panel_D0.pt --output outputs/training/models/finetuned/cnn_seq2point_y_LED_Panel_D0_finetuned_natural.pt --window-size 5`
+
+- Microwave On and Impact Drill (optional but strong performers):
+  - Microwave_On_S0: `py -3.11 scripts/finetune.py --config configs/default_config.yaml --predictions outputs/inference/natural_predictions.csv --model outputs/training/models/cnn_seq2point_y_Microwave_On_S0.pt --output outputs/training/models/finetuned/cnn_seq2point_y_Microwave_On_S0_finetuned_natural.pt --window-size 5`
+  - Impact_Drill_P0: `py -3.11 scripts/finetune.py --config configs/default_config.yaml --predictions outputs/inference/natural_predictions.csv --model outputs/training/models/cnn_seq2point_y_Impact_Drill_P0.pt --output outputs/training/models/finetuned/cnn_seq2point_y_Impact_Drill_P0_finetuned_natural.pt --window-size 5`
+
+You can prioritise a subset (e.g. Incandescent_Lamp, AC_Adapter_Sony, Soldering_Station, Oil_Heater_Q/R, chargers, Smoke_Extractor, LED_Panel) depending on time.
+
+### Step 5: Re-run inference with fine-tuned models (after Step 4)
+
+After some fine-tuning runs complete, re-run inference so that `scripts/inference.py` automatically picks up any `*_finetuned_natural.pt` weights in `outputs/training/models`:
 
 ```bash
-python scripts/finetune.py \
-  --predictions outputs/natural_predictions.csv \
-  --model outputs/models/cnn_seq2point_y_Incandescent_Lamp_N0.pt \
-  --output outputs/models/cnn_seq2point_y_Incandescent_Lamp_N0_finetuned_natural.pt \
-  --config configs/default_config.yaml
+py -3.11 scripts/inference.py \
+  --data Exports/dataset_undersampled_5s/lit_natural_5s.csv \
+  --model-dir outputs/training/models/finetuned \
+  --output outputs/inference/natural_predictions_finetuned.csv \
+  --plot-dir outputs/inference/plots_finetuned \
+  --config configs/default_config.yaml \
+  --window-size 5
 ```
 
-Repeat for other appliances (e.g. AC_Adapter_Sony, Soldering_Station, Oil_Heater_Q0, etc.) as needed.
-
-### Step 4: (Optional) Re-run inference with fine-tuned models
-
-Point `--model-dir` to a directory that contains both base and fine-tuned `.pt` files (with the same naming convention you use for fine-tuned models). The inference script will typically prefer fine-tuned weights when present. Then regenerate plots and compare with pre–fine-tuning results.
+Then compare histograms and ON/OFF overlays between `outputs/inference/plots` and `outputs/inference/plots_finetuned` to quantify improvements on natural data.
 
 ---
 

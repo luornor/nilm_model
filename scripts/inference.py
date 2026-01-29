@@ -88,23 +88,38 @@ def main():
     
     # Find models
     if args.appliances:
+        # Appliances explicitly provided on the command line
         appliances = args.appliances
     else:
         # Auto-discover from model directory
         model_files = glob(os.path.join(args.model_dir, "cnn_seq2point_*.pt"))
-        # Filter out fine-tuned models (prefer base models for inference)
-        base_models = [f for f in model_files if "finetuned" not in f]
+
+        # Prefer base models when both base and fine-tuned exist in the same directory.
+        # If no base models are present (e.g. directory contains only fine-tuned
+        # weights), fall back to using all matching files.
+        base_models = [f for f in model_files if "finetuned" not in os.path.basename(f)]
+        discovery_files = base_models if base_models else model_files
+
         appliances = []
-        for model_file in base_models:
+        for model_file in discovery_files:
             # Extract appliance name from filename.
-            # Expected format: "cnn_seq2point_y_ApplianceName.pt"
+            # Expected base formats:
+            #   "cnn_seq2point_y_ApplianceName.pt"
+            #   "cnn_seq2point_y_ApplianceName_finetuned_natural.pt" (when only
+            #   fine-tuned models are present in model_dir).
             basename = os.path.basename(model_file)
             prefix = "cnn_seq2point_"
             suffix = ".pt"
             if basename.startswith(prefix) and basename.endswith(suffix):
-                # Strip the prefix and suffix to get the appliance name, e.g.
-                # "cnn_seq2point_y_AC_Adapter_Sony_M0.pt" -> "y_AC_Adapter_Sony_M0"
-                appliance = basename[len(prefix):-len(suffix)]
+                core = basename[len(prefix):-len(suffix)]
+                # Normalize appliance name so that downstream loading logic can
+                # always look for either
+                #   cnn_seq2point_{appliance}.pt
+                #   cnn_seq2point_{appliance}_finetuned_natural.pt
+                if core.endswith("_finetuned_natural"):
+                    appliance = core[: -len("_finetuned_natural")]
+                else:
+                    appliance = core
                 appliances.append(appliance)
     
     print(f"Found {len(appliances)} appliances to predict")

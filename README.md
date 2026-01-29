@@ -96,7 +96,7 @@ file1.mat,5,125.3,1,0
 Train models on synthetic/simulated data:
 
 ```bash
-python scripts/train.py \
+py -3.11 scripts/train.py \
     --data Dataset/Exports/train_mix_5s.csv \
     --output outputs/training \
     --config configs/default_config.yaml
@@ -112,7 +112,7 @@ This will:
 Generate predictions on natural data:
 
 ```bash
-python scripts/inference.py \
+py -3.11 scripts/inference.py \
     --data Dataset/Exports/dataset_undersampled_5s/lit_natural_5s.csv \
     --model-dir outputs/training/models \
     --output outputs/predictions.csv \
@@ -125,7 +125,7 @@ python scripts/inference.py \
 Fine-tune models using self-training on natural data:
 
 ```bash
-python scripts/finetune.py \
+py -3.11 scripts/finetune.py \
     --predictions outputs/predictions.csv \
     --model outputs/training/models/cnn_seq2point_y_Incandescent_Lamp_N0.pt \
     --output outputs/training/models/cnn_seq2point_y_Incandescent_Lamp_N0_finetuned_natural.pt \

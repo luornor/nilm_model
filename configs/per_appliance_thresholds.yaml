@@ -1,0 +1,98 @@
+# Per-appliance ON/OFF thresholds derived from
+# outputs/inference/natural_predictions.csv on natural data.
+# on: probability to switch from OFF -> ON
+# off: probability to switch from ON -> OFF
+
+appliance_thresholds:
+  y_LED_Lamp_B0:
+    category: almost_always_off
+    on: 0.6
+    off: 0.4
+  y_Hair_Dryer_1900W_U0:
+    category: almost_always_off
+    on: 0.6
+    off: 0.4
+  y_Resistor_200ohm_L0:
+    category: almost_always_off
+    on: 0.6
+    off: 0.4
+  y_Microwave_Standby_A0:
+    category: almost_always_off
+    on: 0.6
+    off: 0.4
+  y_Fan_Heater_T0:
+    category: almost_always_off
+    on: 0.6
+    off: 0.4
+  y_Hair_Dryer_2100W_Z0:
+    category: almost_always_off
+    on: 0.6
+    off: 0.4
+
+  y_Hair_Dryer_2100W_Y0:
+    category: mostly_low
+    on: 0.6
+    off: 0.4
+  y_Oil_Heater_R0:
+    category: mostly_low
+    on: 0.6
+    off: 0.4
+  y_Fan_3Speed_K0:
+    category: mostly_low
+    on: 0.6
+    off: 0.4
+  y_Hair_Dryer_1900W_V0:
+    category: mostly_low
+    on: 0.6
+    off: 0.4
+  y_Hair_Dryer_2000W_X0:
+    category: mostly_low
+    on: 0.6
+    off: 0.4
+  y_Hair_Dryer_2000W_W0:
+    category: mostly_low
+    on: 0.6
+    off: 0.4
+  y_AC_Adapter_Sony_M0:
+    category: mostly_low
+    on: 0.6
+    off: 0.4
+  y_Impact_Drill_P0:
+    category: mostly_low
+    on: 0.6
+    off: 0.4
+
+  y_Phone_Charger_Asus_G0:
+    category: ambiguous
+    on: 0.6
+    off: 0.4
+  y_Microwave_On_S0:
+    category: ambiguous
+    on: 0.6
+    off: 0.4
+  y_Oil_Heater_Q0:
+    category: ambiguous
+    on: 0.6
+    off: 0.4
+  y_Phone_Charger_Motorola_I0:
+    category: ambiguous
+    on: 0.6
+    off: 0.4
+
+  y_Incandescent_Lamp_N0:
+    category: bimodal
+    on: 0.8
+    off: 0.2
+  y_Soldering_Station_H0:
+    category: bimodal
+    on: 0.8
+    off: 0.2
+  y_LED_Panel_D0:
+    category: bimodal
+    on: 0.8
+    off: 0.2
+
+  y_Smoke_Extractor_E0:
+    category: mostly_high
+    on: 0.8
+    off: 0.2

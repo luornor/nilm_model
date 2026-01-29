@@ -6,8 +6,6 @@ This document consolidates the key design, architecture, and refactoring informa
 
 ## 1. Pipeline Overview
 
-_Source: `PIPELINE_EXPLANATION.md`_
-
 # NILM Pipeline: Current Implementation Analysis
 
 ## End-to-End Data Flow
@@ -325,8 +323,6 @@ _Source: `STRUCTURE.md`_
 
 ## 3. Model Architecture Analysis
 
-_Source: `MODEL_ANALYSIS.md`_
-
 # Model Architecture Analysis & Recommendations
 
 ## Current Model Performance
@@ -549,8 +545,6 @@ The current model is a **good baseline** but has significant room for improvemen
 
 ## 4. Refactoring Summary
 
-_Source: `REFACTORING_SUMMARY.md`_
-
 # NILM Framework Refactoring Summary
 
 ## Overview
@@ -561,13 +555,6 @@ The NILM research pipeline has been refactored from a collection of standalone s
 
 ### 1. **Modular Package Structure**
 
-**Before**: Scattered scripts with duplicated code
-- `train_seq2point_binary.py`
-- `finetune_natural_selftrain.py`
-- `natural_data_inference.py`
-- Each script duplicated Dataset, Model, and windowing logic
-
-**After**: Organized package structure
 ```
 nilm_framework/
 ├── config.py          # Centralized configuration
@@ -579,134 +566,6 @@ nilm_framework/
 ├── evaluation/        # Metrics and plotting
 └── utils/             # Helper functions
 ```
-
-### 2. **Configuration Management**
-
-**Before**: Hard-coded paths and hyperparameters in each script
-```python
-CSV_PATH = r"C:\Users\ASUS\Desktop\Projects\ML Project\..."
-WINDOW = 5
-BATCH = 256
-EPOCHS = 8
-```
-
-**After**: YAML-based configuration with dataclass defaults
-```yaml
-data:
-  window_size: 5
-  bin_size_seconds: 5.0
-training:
-  batch_size: 256
-  epochs: 8
-  learning_rate: 0.001
-```
-
-### 3. **Reusable Components**
-
-**Before**: Duplicated code across scripts
-- `Seq2PointDataset` defined 3 times
-- `SmallCNN` defined 3 times
-- `make_windows` logic duplicated
-
-**After**: Single source of truth
-- `NILMDataset` in `data/dataset.py`
-- `Seq2PointCNN` in `models/seq2point.py`
-- `make_windows` in `utils/data_utils.py`
-
-### 4. **Separation of Concerns**
-
-**Before**: Training, inference, and plotting mixed together
-
-**After**: Clear separation
-- `training/`: Training loop, metrics
-- `inference/`: Prediction utilities
-- `evaluation/`: Plotting and evaluation
-
-### 5. **Extensibility**
-
-**Before**: Adding new models required copying entire scripts
-
-**After**: Easy to extend
-- Inherit from `BaseNILMModel`
-- Add to `models/__init__.py`
-- Use existing training infrastructure
-
-## Migration Guide
-
-### Old Training Script
-
-```python
-# train_seq2point_binary.py
-CSV_PATH = r"C:\Users\ASUS\Desktop\..."
-WINDOW = 5
-# ... hard-coded config ...
-
-def train_one(df, target_col):
-    # ... training logic ...
-```
-
-### New Training Script
-
-```bash
-python scripts/train.py \
-    --data Dataset/Exports/train_mix_5s.csv \
-    --output outputs/training \
-    --config configs/default_config.yaml
-```
-
-Or programmatically:
-
-```python
-from nilm_framework.config import ExperimentConfig
-from nilm_framework.models import Seq2PointCNN
-from nilm_framework.data import create_dataloaders
-from nilm_framework.training import Trainer
-
-config = ExperimentConfig.from_yaml("configs/default_config.yaml")
-train_loader, val_loader = create_dataloaders(df, target_col, ...)
-model = Seq2PointCNN(...)
-trainer = Trainer(model, config.training)
-trainer.train(train_loader, val_loader)
-```
-
-## File Mapping
-
-| Old File | New Location | Notes |
-|---------|--------------|-------|
-| `train_seq2point_binary.py` | `scripts/train.py` | Uses framework modules |
-| `finetune_natural_selftrain.py` | `scripts/finetune.py` | Uses `finetuning.SelfTrainer` |
-| `natural_data_inference.py` | `scripts/inference.py` | Uses `inference.Predictor` |
-| Dataset class (duplicated) | `nilm_framework/data/dataset.py` | Single implementation |
-| Model class (duplicated) | `nilm_framework/models/seq2point.py` | Extensible architecture |
-| Window creation (duplicated) | `nilm_framework/utils/data_utils.py` | Reusable utility |
-
-## Configuration Changes
-
-### Old Approach
-- Hard-coded in each script
-- Windows-specific absolute paths
-- No easy way to change hyperparameters
-
-### New Approach
-- YAML configuration files
-- Relative paths (configurable)
-- Easy to experiment with different settings
-
-## Benefits
-
-1. **Reproducibility**: Centralized configuration ensures experiments are reproducible
-2. **Maintainability**: Single source of truth for each component
-3. **Extensibility**: Easy to add new models, metrics, or features
-4. **Testability**: Modular design enables unit testing
-5. **Documentation**: Clear structure with docstrings
-6. **Flexibility**: Support for different sampling rates, window sizes, etc.
-
-## Backward Compatibility
-
-The old scripts are preserved in `Dataset/Training/` for reference. The new framework:
-- Uses the same data format (CSV with `file`, `t_sec`, `P`, `y_*` columns)
-- Produces compatible model files (`.pt` PyTorch state dicts)
-- Generates similar output CSVs and plots
 
 ## Next Steps
 
@@ -744,17 +603,7 @@ python scripts/finetune.py \
     --output outputs/training/models/cnn_seq2point_y_Incandescent_Lamp_N0_finetuned.pt
 ```
 
-## Questions?
-
-See the main README for detailed documentation and usage examples.
-
----
-
 ## 5. Improved Models Integration
-
-_Source: `UPDATES_SUMMARY.md`_
-
-# Updates Summary: Improved Models Integration
 
 ## Changes Made
 
@@ -888,14 +737,6 @@ python scripts/inference.py \
     --config configs/default_config.yaml
 ```
 
-## Backward Compatibility
-
-✅ **Old models still work**: Scripts can load models trained with `Seq2PointCNN`
-
-✅ **Configurable**: Change `model.name` in config to use different architectures
-
-✅ **Automatic detection**: Scripts try to infer model type from config
-
 ## Next Steps
 
 1. **Train new models** with improved architecture:
@@ -935,20 +776,3 @@ If training fails with OOM:
 - Increase training epochs
 - Try different dropout values (0.2-0.5)
 - Consider larger windows (`window_size: 10`)
-
-## Summary
-
-✅ All scripts updated to use improved models
-✅ Configuration set to optimal defaults
-✅ Backward compatible with old models
-✅ Ready to train with better performance!
-
-The framework now uses `ImprovedSeq2PointCNN` by default with:
-- Deeper architecture (4 layers)
-- Batch normalization
-- Dropout regularization (0.3)
-- Longer training (30 epochs)
-- Learning rate scheduling
-- Best model saving
-
-Expected F1 improvement: **0.44 → 0.60-0.70** for top appliances!
