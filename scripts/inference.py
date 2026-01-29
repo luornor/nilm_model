@@ -96,11 +96,15 @@ def main():
         base_models = [f for f in model_files if "finetuned" not in f]
         appliances = []
         for model_file in base_models:
-            # Extract appliance name from filename
+            # Extract appliance name from filename.
+            # Expected format: "cnn_seq2point_y_ApplianceName.pt"
             basename = os.path.basename(model_file)
-            # Format: cnn_seq2point_y_ApplianceName.pt
-            if basename.startswith("cnn_seq2point_") and basename.endswith(".pt"):
-                appliance = basename[15:-3]  # Remove prefix and suffix
+            prefix = "cnn_seq2point_"
+            suffix = ".pt"
+            if basename.startswith(prefix) and basename.endswith(suffix):
+                # Strip the prefix and suffix to get the appliance name, e.g.
+                # "cnn_seq2point_y_AC_Adapter_Sony_M0.pt" -> "y_AC_Adapter_Sony_M0"
+                appliance = basename[len(prefix):-len(suffix)]
                 appliances.append(appliance)
     
     print(f"Found {len(appliances)} appliances to predict")

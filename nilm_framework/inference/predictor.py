@@ -61,16 +61,17 @@ class Predictor:
         if len(X) == 0:
             return np.full(len(power), np.nan, dtype=np.float32)
         
-        # Create dataset from pre-windowed data
-        dataset = NILMDataset.from_windows(X, y=None)
-        loader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
+        # Create batched tensor directly (no targets needed for inference)
+        X_tensor = torch.tensor(X, dtype=torch.float32)[:, None, :]  # (N, 1, T)
         
-        # Predict
+        # Predict in batches
         all_probs = []
+        self.model.eval()
         with torch.no_grad():
-            for x, _ in loader:
-                x = x.to(self.device)
-                logits = self.model(x)
+            for start in range(0, len(X_tensor), batch_size):
+                end = start + batch_size
+                x_batch = X_tensor[start:end].to(self.device)
+                logits = self.model(x_batch)
                 probs = torch.sigmoid(logits).cpu().numpy().reshape(-1)
                 all_probs.extend(probs)
         

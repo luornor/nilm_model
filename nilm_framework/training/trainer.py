@@ -94,6 +94,7 @@ class Trainer:
         if scheduler_type == "ReduceLROnPlateau":
             patience = getattr(self.config, 'scheduler_patience', 3)
             factor = getattr(self.config, 'scheduler_factor', 0.5)
+            # Note: verbose parameter not included for compatibility with older PyTorch versions
             return optim.lr_scheduler.ReduceLROnPlateau(
                 self.optimizer,
                 mode='max',  # Maximize F1 score
