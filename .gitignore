@@ -1,6 +1,6 @@
 # Ignore MATLAB data folder inside Dataset
 /Dataset/Matlab_Data/
-
+/David_Data/
 # Python artifacts
 __pycache__/
 *.py[cod]
