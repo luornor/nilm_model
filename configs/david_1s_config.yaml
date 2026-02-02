@@ -1,46 +1,46 @@
-# Default configuration for NILM framework
+# Configuration for David_Data 1s-binned training
 
-experiment_name: "nilm_experiment"
-output_dir: "outputs"
+experiment_name: "david_1s_experiment"
+output_dir: "outputs/david_training"
 
 # Data configuration
 data:
   dataset_root: "Dataset"
   matlab_data_dir: "Matlab_Data"
   exports_dir: "Exports"
-  bin_size_seconds: 5.0
-  window_size: 5  # in number of samples
+  bin_size_seconds: 1.0       # Our david_train_1s.csv uses 1-second bins
+  window_size: 5              # 5-second context over 1s bins
   normalize_per_window: true
-  min_samples_per_appliance: 200
-  min_positives_per_appliance: 20
+  # David_Data is small per appliance, so use smaller thresholds
+  min_samples_per_appliance: 20
+  min_positives_per_appliance: 5
 
 # Model configuration
 model:
-  name: "ImprovedSeq2PointCNN"  # Options: "Seq2PointCNN", "ImprovedSeq2PointCNN", "DeepSeq2PointCNN"
-  window_size: 5  # in number of samples
+  name: "ImprovedSeq2PointCNN"
+  window_size: 5
   input_channels: 1
-  conv_channels: [32, 64, 128, 64]  # Deeper than original [16, 32]
+  conv_channels: [32, 64, 128, 64]
   conv_kernel_size: 3
   conv_padding: 1
-  hidden_dim: 64  # Larger than original 32
+  hidden_dim: 64
   output_dim: 1
   activation: "relu"
-  dropout: 0.3  # Add regularization (was 0.0)
-  use_batch_norm: true  # Enable batch normalization
-  use_residual: false  # For DeepSeq2PointCNN_batch_norm: true
+  dropout: 0.3
+  use_batch_norm: true
+  use_residual: false
 
 # Training configuration
 training:
-  batch_size: 256
+  batch_size: 128             # Slightly smaller for safety
   learning_rate: 0.001
-  epochs: 30  # Train longer (was 8)
+  epochs: 30
   seed: 42
   loss_type: "BCEWithLogitsLoss"
   pos_weight_auto: true
   optimizer: "Adam"
   optimizer_kwargs: {}
-  # Learning rate scheduler
-  scheduler: "ReduceLROnPlateau"  # Reduce LR when validation F1 plateaus
+  scheduler: "ReduceLROnPlateau"
   scheduler_patience: 3
   scheduler_factor: 0.5
   scheduler_step_size: 10
@@ -48,10 +48,10 @@ training:
   val_split: 0.2
   stratify: true
   log_interval: 100
-  save_best: true  # Save best model based on validation F1
-  device: null  # null = auto-detect
+  save_best: true
+  device: null
 
-# Fine-tuning configuration
+# Fine-tuning configuration (unused for now)
 fine_tuning:
   predictions_csv: ""
   pos_threshold: 0.90
@@ -64,12 +64,12 @@ fine_tuning:
   batch_size: 256
   use_fallback_selection: true
 
-# Inference configuration
+# Inference configuration (placeholder)
 inference:
   natural_data_csv: ""
   model_dir: ""
   output_csv: ""
-  target_appliances: []  # Empty = all available
+  target_appliances: []
   smoothing_window: 5
   on_threshold: 0.55
   off_threshold: 0.45
@@ -78,5 +78,5 @@ inference:
   plot_overlay: true
   plot_output_dir: ""
 
-# Target appliances (None = auto-discover from data)
+# Train all discovered appliances by default
 target_appliances: null
