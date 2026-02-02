@@ -9,7 +9,7 @@ data:
   matlab_data_dir: "Matlab_Data"
   exports_dir: "Exports"
   bin_size_seconds: 5.0
-  window_size: 5
+  window_size: 60  # in number of samples
   normalize_per_window: true
   min_samples_per_appliance: 200
   min_positives_per_appliance: 20
@@ -17,7 +17,7 @@ data:
 # Model configuration
 model:
   name: "ImprovedSeq2PointCNN"  # Options: "Seq2PointCNN", "ImprovedSeq2PointCNN", "DeepSeq2PointCNN"
-  window_size: 5
+  window_size: 60  # in number of samples
   input_channels: 1
   conv_channels: [32, 64, 128, 64]  # Deeper than original [16, 32]
   conv_kernel_size: 3
