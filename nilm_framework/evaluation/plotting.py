@@ -46,13 +46,21 @@ def plot_confidence_histogram(
         bins: Number of histogram bins
     """
     probs_clean = probabilities[~np.isnan(probabilities)]
-    
+
     if len(probs_clean) == 0:
         print("No valid probabilities to plot")
         return
-    
+
     plt.figure(figsize=(7, 4))
-    plt.hist(probs_clean, bins=bins)
+
+    # Newer NumPy versions can raise an error if the data range is
+    # extremely small relative to the requested number of bins.
+    # Try the requested bin count first, and if it fails, fall back
+    # to a single-bin histogram so plotting never crashes inference.
+    try:
+        plt.hist(probs_clean, bins=bins)
+    except ValueError:
+        plt.hist(probs_clean, bins=1)
     plt.title(title)
     plt.xlabel("Model Confidence (0–1)")
     plt.ylabel("Count")

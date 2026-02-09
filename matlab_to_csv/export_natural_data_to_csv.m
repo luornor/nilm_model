@@ -3,8 +3,8 @@ function export_natural_data_to_csv()
     DATASET_ROOT = "C:\Users\ASUS\Desktop\Projects\ML Project\Dataset";
     IN_ROOT  = fullfile(DATASET_ROOT, "Matlab_Data", "Natural");
     OUT_DIR  = fullfile(DATASET_ROOT, "Exports");
-    OUT_CSV  = fullfile(OUT_DIR, "lit_natural_5s_states.csv");
-    BIN_S    = 5;   % 5-second LF bins
+    OUT_CSV  = fullfile(OUT_DIR, "lit_natural_1s_states.csv");
+    BIN_S    = 1;   % 1-second LF bins
 
     if ~isfolder(OUT_DIR), mkdir(OUT_DIR); end
 
