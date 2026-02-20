@@ -1,0 +1,333 @@
+# Device Taxonomy for Multi-Dataset NILM Framework
+# This file defines device categories, mappings, and load type classifications
+
+# Device categories (for transfer learning)
+device_taxonomy:
+  heating:
+    - Hair_Iron
+    - Hair_Dryer_1900W_U0
+    - Hair_Dryer_2000W_W0
+    - Hair_Dryer_2000W_X0
+    - Hair_Dryer_2100W_Y0
+    - Hair_Dryer_2100W_Z0
+    - Heater
+    - Griddle
+    - Iron
+    - Coffee_maker
+    - Water_kettle
+    - Kettle
+    - Stove
+    - Rice_cooker
+    - Oil_Heater_Q0
+    - Oil_Heater_R0
+  
+  cooling:
+    - Air_Conditioner
+    - Fridge
+    - Fridge_defroster
+    - Freezer
+    - Refrigerator
+  
+  entertainment:
+    - Smart_TV
+    - TV_1
+    - TV_2
+    - TV_3
+    - TV_4
+    - Monitor
+    - PlayStation
+    - Speaker
+  
+  kitchen_major:
+    - Microwave
+    - Microwave_On_S0
+    - Microwave_Standby_A0
+    - Oven
+    - Dishwasher
+    - Washing_machine
+    - Blender
+    - Airfryer
+    - Electric_stove
+  
+  kitchen_minor:
+    - Coffee_maker
+    - Coffee_Machine
+    - Water_kettle
+    - Kettle
+    - Rice_cooker
+  
+  motors:
+    - Vacuum
+    - Fan
+    - Fan_3Speed_K0
+    - Fan_Heater_T0
+    - Washing_machine
+    - Smoke_Extractor_E0
+  
+  lighting:
+    - Incandescent_Light_Bulb
+    - Incandescent_Lamp_N0
+    - Compact_Fluorescent_Lamp
+    - Light
+    - LED_Lamp_B0
+    - LED_Panel_D0
+  
+  electronics_low_power:
+    - Charger
+    - Phone_Charger_Asus_G0
+    - Phone_Charger_Motorola_I0
+    - Laptop
+    - Computer
+    - Monitor
+    - AC_Adapter_Sony_M0
+  
+  specialized:
+    - Water_Heater
+    - Deep_freezer
+    - Soldering_Station_H0
+    - Impact_Drill_P0
+    - Resistor_200ohm_L0
+
+# Device name mappings (normalize across datasets)
+# Format: "source_name": "canonical_name"
+device_mappings:
+  "Kettle": "Water_kettle"
+  "Coffee Machine": "Coffee_maker"
+  "Refrigerator": "Fridge"
+  "TV 1": "TV_1"
+  "TV 2": "TV_2"
+  "TV 3": "TV_3"
+  "TV 4": "TV_4"
+  "TV1": "TV_1"
+  "TV2": "TV_2"
+  "TV3": "TV_3"
+  "TV4": "TV_4"
+  "Incandescent Lamp": "Incandescent_Light_Bulb"
+  "CFL": "Compact_Fluorescent_Lamp"
+  "LED Lamp": "LED_Panel"
+  "Heater ST-1": "Heater"
+  "Hair dryer": "Hair_Dryer"
+  "Washing Machine": "Washing_machine"
+  "Air conditioner": "Air_Conditioner"
+
+# Load type classification
+# Used for load-type-aware architectures
+load_types:
+  resistive:
+    - Hair_Iron
+    - Hair_Dryer_1900W_U0
+    - Hair_Dryer_2000W_W0
+    - Hair_Dryer_2000W_X0
+    - Hair_Dryer_2100W_Y0
+    - Hair_Dryer_2100W_Z0
+    - Heater
+    - Griddle
+    - Iron
+    - Coffee_maker
+    - Water_kettle
+    - Kettle
+    - Stove
+    - Incandescent_Light_Bulb
+    - Incandescent_Lamp_N0
+    - Light
+    - Rice_cooker
+    - Oil_Heater_Q0
+    - Oil_Heater_R0
+    - Resistor_200ohm_L0
+  
+  reactive:
+    - Air_Conditioner
+    - Fridge
+    - Fridge_defroster
+    - Freezer
+    - Microwave
+    - Microwave_On_S0
+    - Vacuum
+    - Washing_machine
+    - Fan
+    - Fan_3Speed_K0
+    - Fan_Heater_T0
+    - Smoke_Extractor_E0
+  
+  switched_source:
+    - Charger
+    - Phone_Charger_Asus_G0
+    - Phone_Charger_Motorola_I0
+    - Laptop
+    - Computer
+    - Monitor
+    - Smart_TV
+    - TV_1
+    - TV_2
+    - TV_3
+    - TV_4
+    - PlayStation
+    - Speaker
+    - AC_Adapter_Sony_M0
+    - LED_Lamp_B0
+    - LED_Panel_D0
+    - Compact_Fluorescent_Lamp
+  
+  mixed:
+    - Washing_machine  # Can be both reactive (motor) and resistive (heater)
+    - Dishwasher
+    - Oven
+    - Microwave_Standby_A0
+
+# Power-based device differentiation
+# When same device appears in multiple datasets with different power ratings
+power_based_variants:
+  Microwave:
+    - name: "Microwave_800W"
+      power_range: [700, 900]
+      dataset: "dataset1"
+      load_type: "reactive"
+    - name: "Microwave_650W"
+      power_range: [550, 750]
+      dataset: "dataset2"
+      load_type: "reactive"
+    - name: "Microwave_On_S0"
+      power_range: [null, null]  # Unknown, from LIT dataset
+      dataset: "lit_synthetic"
+      load_type: "reactive"
+  
+  Washing_machine:
+    - name: "Washing_machine_2200W"
+      power_range: [2000, 2400]
+      dataset: "dataset1"
+      load_type: "mixed"
+    - name: "Washing_machine_780W"
+      power_range: [600, 900]
+      dataset: "dataset2"
+      load_type: "reactive"
+  
+  Hair_Dryer:
+    - name: "Hair_Dryer_1900W_U0"
+      power_range: [1800, 2000]
+      dataset: "lit_synthetic"
+      load_type: "resistive"
+    - name: "Hair_Dryer_2000W_W0"
+      power_range: [1900, 2100]
+      dataset: "lit_synthetic"
+      load_type: "resistive"
+    - name: "Hair_Dryer_2100W_Z0"
+      power_range: [2000, 2200]
+      dataset: "lit_synthetic"
+      load_type: "resistive"
+    - name: "Hair_Dryer_2300W"
+      power_range: [2200, 2400]
+      dataset: "dataset1"
+      load_type: "resistive"
+  
+  TV:
+    - name: "TV_1"
+      power_range: [40, 50]
+      dataset: "dataset2_bedroom1"
+      load_type: "switched_source"
+    - name: "TV_2"
+      power_range: [30, 40]
+      dataset: "dataset2_bedroom2"
+      load_type: "switched_source"
+    - name: "TV_3"
+      power_range: [10, 20]
+      dataset: "dataset2_bedroom3"
+      load_type: "switched_source"
+    - name: "TV_4"
+      power_range: [180, 190]
+      dataset: "dataset2_living_room"
+      load_type: "switched_source"
+    - name: "Smart_TV"
+      power_range: [null, null]
+      dataset: "david"
+      load_type: "switched_source"
+
+# Transfer learning recommendations
+# Maps new devices to best source models for transfer learning
+transfer_learning_map:
+  # New devices from Dataset #1 (Home appliances)
+  Iron: "Hair_Iron"  # Both resistive heating elements
+  Griddle: "Coffee_maker"  # Both resistive, similar power range
+  Heater: "Oil_Heater_Q0"  # Both heating appliances
+  Charger: "Phone_Charger_Asus_G0"  # Both switched-source, low power
+  Computer: "Laptop"  # Both computing devices, switched-source
+  Monitor: "Laptop"  # Similar electronics
+  
+  # New devices from Dataset #2 (Room occupancy)
+  TV_1: "Laptop"  # Electronics, low power
+  TV_2: "Laptop"
+  TV_3: "Laptop"
+  TV_4: "Laptop"
+  PlayStation: "Laptop"  # Gaming console, similar to computing
+  Dishwasher: "Washing_machine"  # Both motor + heater
+  Water_Heater: "Oil_Heater_Q0"  # Both heating
+  Deep_freezer: "Fridge"  # Both refrigeration
+  
+  # Devices that need training from scratch (no good source)
+  Electric_stove: null
+  Rice_cooker: null
+  Speaker: null
+  Airfryer: null
+  Oven: null
+
+# Priority ranking for implementation
+# Higher priority = implement first
+device_priority:
+  high:  # Common, high-power, safety-critical
+    - Washing_machine
+    - Microwave
+    - Oven
+    - Air_Conditioner
+    - Water_Heater
+    - Heater
+    - Iron
+  
+  medium:  # Moderate usage, moderate power
+    - Dishwasher
+    - TV_1
+    - TV_2
+    - TV_3
+    - TV_4
+    - Computer
+    - Monitor
+    - Coffee_maker
+    - Kettle
+  
+  low:  # Low power or rare usage
+    - PlayStation
+    - Speaker
+    - Charger
+    - Rice_cooker
+    - Airfryer
+    - Deep_freezer
+
+# Dataset metadata
+datasets:
+  lit_synthetic:
+    name: "LIT Synthetic/Simulated Data"
+    num_devices: 23
+    sampling_rate: "variable"
+    format: "MATLAB .mat files"
+    has_labels: true
+  
+  david_natural:
+    name: "David Natural Data"
+    num_devices: 12
+    sampling_rate: "30kHz (aggregated to 1s)"
+    format: "MATLAB .mat files"
+    has_labels: true
+  
+  dataset1:
+    name: "Home Appliances Dataset"
+    num_devices: 14
+    sampling_rate: "unknown"
+    format: "unknown"
+    has_labels: true
+    source: "Image 1"
+  
+  dataset2:
+    name: "Room Occupancy Dataset"
+    num_devices: 13
+    sampling_rate: "unknown"
+    format: "unknown"
+    has_labels: true
+    source: "Image 2 (CASAS-style)"
