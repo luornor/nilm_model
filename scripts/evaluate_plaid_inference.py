@@ -1,20 +1,20 @@
 #!/usr/bin/env python
-"""Evaluate David models by comparing predictions to labels.
+"""Evaluate PLAID models by comparing predictions to labels.
 
 This script joins:
-- Ground truth labels from Exports/david_train_1s.csv
-- Predictions from outputs/david_inference/david_preds_1s.csv
+- Ground truth labels from Exports/plaid_train_1s.csv
+- Predictions from outputs/plaid_inference/plaid_preds_1s.csv
 
 and computes metrics per appliance to verify that:
 - The labelling logic is sensible
-- The models trained on David_Data actually match those labels.
+- The models trained on PLAID_Data actually match those labels.
 
 Usage (from project root):
 
-    py -3.11 scripts/evaluate_david_inference.py \
-        --labels Exports/david_train_1s.csv \
-        --preds outputs/david_inference/david_preds_1s.csv \
-        --output outputs/david_inference/david_eval_1s.csv
+    py -3.11 scripts/evaluate_plaid_inference.py \
+        --labels Exports/plaid_train_1s.csv \
+        --preds outputs/plaid_inference/plaid_preds_1s.csv \
+        --output outputs/plaid_inference/plaid_eval_1s.csv
 
 """
 
@@ -113,9 +113,9 @@ def evaluate(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Evaluate David predictions against David labels")
-    parser.add_argument("--labels", type=str, required=True, help="Path to david_train_1s.csv (with y_* labels)")
-    parser.add_argument("--preds", type=str, required=True, help="Path to david_preds_1s.csv (with prob_y_* columns)")
+    parser = argparse.ArgumentParser(description="Evaluate PLAID predictions against PLAID labels")
+    parser.add_argument("--labels", type=str, required=True, help="Path to plaid_train_1s.csv (with y_* labels)")
+    parser.add_argument("--preds", type=str, required=True, help="Path to plaid_preds_1s.csv (with prob_y_* columns)")
     parser.add_argument("--output", type=str, required=True, help="Where to save evaluation CSV")
     parser.add_argument("--threshold", type=float, default=0.5, help="Probability threshold for ON/OFF (default 0.5)")
 

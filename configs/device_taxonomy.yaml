@@ -238,7 +238,7 @@ power_based_variants:
       load_type: "switched_source"
     - name: "Smart_TV"
       power_range: [null, null]
-      dataset: "david"
+      dataset: "plaid"
       load_type: "switched_source"
 
 # Transfer learning recommendations
@@ -309,8 +309,8 @@ datasets:
     format: "MATLAB .mat files"
     has_labels: true
   
-  david_natural:
-    name: "David Natural Data"
+  plaid_natural:
+    name: "PLAID Natural Data"
     num_devices: 12
     sampling_rate: "30kHz (aggregated to 1s)"
     format: "MATLAB .mat files"

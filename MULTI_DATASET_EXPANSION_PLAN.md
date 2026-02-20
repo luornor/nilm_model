@@ -4,7 +4,7 @@
 
 Your current framework has:
 - **23 trained appliances** from Matlab synthetic/simulated data (LIT dataset)
-- **12 tested appliances** on David natural data (david_eval_1s.csv)
+- **12 tested appliances** on PLAID natural data (plaid_eval_1s.csv)
 - **Current performance**: Accuracy 59-78%, F1 scores 0.60-0.80
 
 **Goal**: Expand to support 20+ additional device types from two new datasets while improving model generalization and performance.
@@ -15,7 +15,7 @@ Your current framework has:
 
 ### 1.1 Devices Currently Supported
 
-**From david_eval_1s.csv (Natural data test results):**
+**From plaid_eval_1s.csv (Natural data test results):**
 - ✅ Hair_Iron (F1: 0.80, Acc: 78%)
 - ✅ Laptop (F1: 0.68, Acc: 60%)
 - ✅ Fridge (F1: 0.68, Acc: 64%)
@@ -229,7 +229,7 @@ power_based_variants:
 #### Step 1.3: Data Quality Assessment
 
 **Action items:**
-- [ ] Analyze sampling rates (30kHz for David data, check others)
+- [ ] Analyze sampling rates (30kHz for PLAID data, check others)
 - [ ] Check for missing values and outliers
 - [ ] Verify event annotations quality
 - [ ] Measure class imbalance (ON/OFF ratio) per device
@@ -775,7 +775,7 @@ def create_performance_dashboard(evaluation_results):
     
     # Heatmap: Devices vs Datasets (F1 scores)
     devices = list(evaluation_results.keys())
-    datasets = ['LIT', 'David', 'Dataset1', 'Dataset2']
+    datasets = ['LIT', 'PLAID', 'Dataset1', 'Dataset2']
     
     f1_matrix = np.array([
         [evaluation_results[dev][ds]['f1'] for ds in datasets]
@@ -852,7 +852,7 @@ def create_performance_dashboard(evaluation_results):
 
 ### 4.2 Performance Targets
 
-| Metric | Current (David 1s) | Target (After expansion) |
+| Metric | Current (PLAID 1s) | Target (After expansion) |
 |--------|-------------------|-------------------------|
 | Average F1 | 0.67 | **0.75** |
 | Top-tier devices (F1 ≥ 0.80) | 1 (8%) | **10+ (25%)** |

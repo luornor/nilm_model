@@ -152,7 +152,7 @@ Computes:
 
 ## Expected Results
 
-### Current Performance (david_eval_1s.csv)
+### Current Performance (plaid_eval_1s.csv)
 - 12 devices tested
 - Average F1: 0.67
 - Best device: Hair_Iron (F1: 0.80)

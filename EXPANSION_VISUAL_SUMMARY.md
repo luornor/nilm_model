@@ -7,13 +7,13 @@ CURRENT STATE                           TARGET STATE (After Expansion)
 ═══════════════════════════════════    ═══════════════════════════════════
 Datasets:                               Datasets:
   • LIT Synthetic (23 devices)            • LIT Synthetic (23 devices)
-  • David Natural (12 tested)             • David Natural (12 devices)
+  • PLAID Natural (12 tested)             • PLAID Natural (12 devices)
                                           • Dataset #1 - Home (14 devices)
                                           • Dataset #2 - Rooms (13 devices)
                                           ────────────────────────────────
 Total: 2 datasets, 23 trained             Total: 4 datasets, 40+ trained
 
-Performance (david_eval_1s.csv):        Target Performance:
+Performance (plaid_eval_1s.csv):        Target Performance:
   • Average F1: 0.67                      • Average F1: 0.75+
   • Best: Hair_Iron (0.80)                • 10+ devices with F1 ≥ 0.80
   • Devices: 12                           • Cross-dataset generalization
@@ -308,14 +308,14 @@ ML Project/
 │   └── per_appliance_thresholds.yaml   ← Thresholds
 │
 ├── Dataset/
-│   ├── David_Data/                     ← Existing
+│   ├── PLAID_Data/                     ← Existing
 │   ├── Matlab_Data/                    ← Existing (LIT)
 │   ├── Dataset1_Home_Appliances/       ← NEW
 │   └── Dataset2_Room_Occupancy/        ← NEW
 │
 ├── Exports/
 │   ├── lit_natural_5s_states.csv       ← Existing
-│   ├── david_train_1s.csv              ← Existing
+│   ├── plaid_train_1s.csv              ← Existing
 │   ├── dataset1_1s.csv                 ← NEW
 │   ├── dataset2_1s.csv                 ← NEW
 │   └── combined_all_datasets.csv       ← NEW: Merged
@@ -352,7 +352,7 @@ ML Project/
 ### Phase 0: Preparation (Today)
 - [ ] Review [MULTI_DATASET_EXPANSION_PLAN.md](MULTI_DATASET_EXPANSION_PLAN.md)
 - [ ] Review [configs/device_taxonomy.yaml](configs/device_taxonomy.yaml)
-- [ ] Understand current performance (david_eval_1s.csv)
+- [ ] Understand current performance (plaid_eval_1s.csv)
 
 ### Phase 1: Data Acquisition (This Week)
 - [ ] Identify Dataset #1 source (Home Appliances table)

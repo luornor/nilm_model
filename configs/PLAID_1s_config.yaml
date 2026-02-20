@@ -1,17 +1,17 @@
-# Configuration for David_Data 1s-binned training
+# Configuration for PLAID_Data 1s-binned training
 
-experiment_name: "david_1s_experiment"
-output_dir: "outputs/david_training"
+experiment_name: "plaid_1s_experiment"
+output_dir: "outputs/plaid_training"
 
 # Data configuration
 data:
   dataset_root: "Dataset"
   matlab_data_dir: "Matlab_Data"
   exports_dir: "Exports"
-  bin_size_seconds: 1.0       # Our david_train_1s.csv uses 1-second bins
+  bin_size_seconds: 1.0       # Our plaid_train_1s.csv uses 1-second bins
   window_size: 5              # 5-second context over 1s bins
   normalize_per_window: true
-  # David_Data is small per appliance, so use smaller thresholds
+  # PLAID_Data is small per appliance, so use smaller thresholds
   min_samples_per_appliance: 20
   min_positives_per_appliance: 5
 

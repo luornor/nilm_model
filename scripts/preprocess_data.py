@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 
 
-"""Preprocessing for Dataset/David_Data.
+"""Preprocessing for Dataset/PLAID_Data.
 
 This script:
 - Reads high-rate aggregated CSVs (30 kHz, 10 s) and metadata_aggregated.json.
@@ -21,8 +21,8 @@ Resulting CSV format (example):
 
 Usage (from repo root):
     python -m scripts.preprocess_data \
-        --data-root Dataset/David_Data \
-        --output-csv Exports/david_train_1s.csv
+        --data-root Dataset/PLAID_Data \
+        --output-csv Exports/plaid_train_1s.csv
 
 You can adjust bin_length_sec (default 1.0) or filtering logic as needed.
 """
@@ -138,7 +138,7 @@ def build_labels_for_appliances(
 def load_aggregate_csv(path: Path) -> np.ndarray:
     """Load aggregated CSV and return a 1D numpy array of the first column.
 
-    David_Data aggregated files appear to have two numeric columns without
+    PLAID_Data aggregated files appear to have two numeric columns without
     a header. We treat the first column as the aggregate signal.
     """
 
@@ -153,12 +153,12 @@ def preprocess_data(
     bin_length_sec: float = 1.0,
     fs_default: float = 30000.0,
 ) -> None:
-    """Main preprocessing routine for David_Data.
+    """Main preprocessing routine for PLAID_Data.
 
     Parameters
     ----------
     data_root : Path
-        Path to Dataset/David_Data.
+        Path to Dataset/PLAID_Data.
     output_csv : Path
         Where to write the unified training CSV.
     bin_length_sec : float
@@ -238,17 +238,17 @@ def preprocess_data(
 def main() -> None:
     import argparse
 
-    parser = argparse.ArgumentParser(description="Preprocess David_Data into training CSV")
+    parser = argparse.ArgumentParser(description="Preprocess PLAID_Data into training CSV")
     parser.add_argument(
         "--data-root",
         type=str,
-        default=str(Path("Dataset") / "David_Data"),
-        help="Path to Dataset/David_Data",
+        default=str(Path("Dataset") / "PLAID_Data"),
+        help="Path to Dataset/PLAID_Data",
     )
     parser.add_argument(
         "--output-csv",
         type=str,
-        default=str(Path("Exports") / "david_train_1s.csv"),
+        default=str(Path("Exports") / "plaid_train_1s.csv"),
         help="Output CSV path",
     )
     parser.add_argument(
