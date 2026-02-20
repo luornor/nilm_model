@@ -1,10 +1,12 @@
 function export_synthetic_data_to_csv()
     % ---- CONFIG ----
     DATASET_ROOT = "C:\Users\ASUS\Desktop\Projects\ML Project\Dataset";
+    OUT_ROOT = "C:\Users\ASUS\Desktop\Projects\ML Project";
+
     IN_ROOT  = fullfile(DATASET_ROOT, "Matlab_Data", "Synthetic");
-    OUT_DIR  = fullfile(DATASET_ROOT, "Exports");
-    OUT_CSV  = fullfile(OUT_DIR, "lit_synth_5s_states.csv");
-    BIN_S    = 5;   % 5-second LF bins
+    OUT_DIR  = fullfile(OUT_ROOT, "Exports");
+    OUT_CSV  = fullfile(OUT_DIR, "lit_synth_1s_states.csv");
+    BIN_S    = 1;   % 1-second LF bins
 
     if ~isfolder(OUT_DIR), mkdir(OUT_DIR); end
 

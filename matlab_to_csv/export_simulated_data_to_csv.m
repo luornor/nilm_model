@@ -1,17 +1,17 @@
 function export_simulated_data_to_csv()
     % ---- CONFIG ----
     DATASET_ROOT = "C:\Users\ASUS\Desktop\Projects\ML Project\Dataset";
-    
+    OUT_ROOT = "C:\Users\ASUS\Desktop\Projects\ML Project";
     % Simulated waveforms live here after bin->mat conversion
     IN_ROOT  = fullfile(DATASET_ROOT, "Matlab_Data", "Simulated");
     
     % We will build label->appliance-name mapping from Synthetic metadata
     SYN_ROOT = fullfile(DATASET_ROOT, "Matlab_Data", "Synthetic");
     
-    OUT_DIR  = fullfile(DATASET_ROOT, "Exports\dataset_undersampled_5s");
-    OUT_CSV  = fullfile(OUT_DIR, "simulated_data_5s_states.csv");
+    OUT_DIR  = fullfile(OUT_ROOT, "Exports");
+    OUT_CSV  = fullfile(OUT_DIR, "simulated_data_1s_states.csv");
     
-    BIN_S    = 5;   % 5-second LF bins
+    BIN_S    = 1;   % 1-second LF bins
 
     if ~isfolder(OUT_DIR), mkdir(OUT_DIR); end
     if ~isfolder(IN_ROOT)

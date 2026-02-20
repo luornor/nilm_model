@@ -1,0 +1,86 @@
+# Configuration for retraining on LIT synthetic+simulated data at 1-second resolution.
+#
+# How to use:
+#   py -3.11 scripts/train.py \
+#       --data Exports/train_mix_1s.csv \
+#       --config configs/lit_1s_config.yaml \
+#       --output-dir outputs/training_lit_1s
+#
+# Before running, generate train_mix_1s.csv:
+#   1. Run matlab_to_csv/export_synthetic_data_to_csv.m  (BIN_S=1 already set)
+#   2. Run matlab_to_csv/export_simulated_data_to_csv.m  (BIN_S=1 already set)
+#   3. py -3.11 scripts/combine_lit_1s.py
+
+experiment_name: "lit_1s_experiment"
+output_dir: "outputs/training_lit_1s"
+
+data:
+  dataset_root: "Dataset"
+  matlab_data_dir: "Matlab_Data"
+  exports_dir: "Exports"
+  bin_size_seconds: 1.0       # matches the 1s-binned train_mix_1s.csv
+  window_size: 5              # 5 consecutive 1s samples = 5 seconds of context
+  normalize_per_window: true
+  min_samples_per_appliance: 200   # more relaxed than PLAID (LIT is larger)
+  min_positives_per_appliance: 20
+
+model:
+  name: "ImprovedSeq2PointCNN"
+  window_size: 5
+  input_channels: 1
+  conv_channels: [32, 64, 128, 64]
+  conv_kernel_size: 3
+  conv_padding: 1
+  hidden_dim: 64
+  output_dim: 1
+  activation: "relu"
+  dropout: 0.3
+  use_batch_norm: true
+  use_residual: false
+
+training:
+  batch_size: 256
+  learning_rate: 0.001
+  epochs: 30
+  seed: 42
+  loss_type: "BCEWithLogitsLoss"
+  pos_weight_auto: true
+  optimizer: "Adam"
+  optimizer_kwargs: {}
+  scheduler: "ReduceLROnPlateau"
+  scheduler_patience: 3
+  scheduler_factor: 0.5
+  scheduler_step_size: 10
+  scheduler_gamma: 0.1
+  val_split: 0.2
+  stratify: true
+  log_interval: 100
+  save_best: true
+  device: null   # null = auto-detect (GPU if available)
+
+fine_tuning:
+  predictions_csv: ""
+  pos_threshold: 0.90
+  neg_threshold: 0.10
+  max_pos_samples: 6000
+  max_neg_samples: 6000
+  min_confident_samples: 200
+  epochs: 5
+  learning_rate: 0.0002
+  batch_size: 256
+  use_fallback_selection: true
+
+inference:
+  natural_data_csv: "Exports/lit_natural_1s_states.csv"
+  model_dir: "outputs/training_lit_1s/models"
+  output_csv: "outputs/inference_lit_1s/natural_predictions.csv"
+  target_appliances: []
+  smoothing_window: 5
+  on_threshold: 0.55
+  off_threshold: 0.45
+  plot_histograms: true
+  plot_onoff_states: true
+  plot_overlay: true
+  plot_output_dir: "outputs/inference_lit_1s/plots"
+
+target_appliances: null
