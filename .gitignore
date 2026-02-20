@@ -1,6 +1,5 @@
 # Ignore MATLAB data folder inside Dataset
-/Dataset/Matlab_Data/
-/David_Data/
+/Dataset/
 # Python artifacts
 __pycache__/
 *.py[cod]
@@ -20,6 +19,7 @@ env/
 *.tmp
 *.swp
 *.swo
+*.pdf
 
 # OS / Editor files
 .DS_Store
